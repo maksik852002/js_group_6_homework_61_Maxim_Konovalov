@@ -5,12 +5,15 @@ import CountryInfo from '../../components/CountryInfo/CoutryInfo';
 import LeftCol from '../../components/LeftCol/LeftCol';
 import RightCol from '../../components/RightCol/RightCol';
 import Dummy from '../../components/Dummy/Dummy';
+import CountryMap from '../../components/CountryMap/CountryMap';
 
 class CountryList extends Component {
   state = {
     countriesName:[],
     countryInfo:[],
     borders:[],
+    lat:'',
+    lng:'',
   };
 
   async componentDidMount() {
@@ -26,7 +29,7 @@ class CountryList extends Component {
     const country = response.data;
     countryInfo.push({name:country.name, population:country.population, flag:country.flag, capital:country.capital, region:country.region});
     await this.getBorders(country.borders);
-    this.setState({countryInfo});
+    this.setState({countryInfo,lat:country.latlng[0],lng:country.latlng[1]});
   };
 
   getBorders = async (countryBorders) => {
@@ -55,24 +58,30 @@ class CountryList extends Component {
         </LeftCol>
         <RightCol>
           {country
-            ? <CountryInfo
-                key={country.name}
-                name={country.name}
-                capital={country.capital}
-                region={country.region}
-                population={country.population}
-                flag={country.flag}
-              >
-                {this.state.borders.length>0 
-                ? this.state.borders.map(el => (
-                  <Countries
-                    key={el.alpha3Code}
-                    name={el.name}
-                    class={this.state.borders.length>0}
-                  />
-                ))
-                : <span>none</span>}
-              </CountryInfo>
+            ? <Fragment>
+              <CountryInfo
+                  key={country.name}
+                  name={country.name}
+                  capital={country.capital}
+                  region={country.region}
+                  population={country.population}
+                  flag={country.flag}
+                >
+                  {this.state.borders.length>0 
+                  ? this.state.borders.map(el => (
+                    <Countries
+                      key={el.alpha3Code}
+                      name={el.name}
+                      class={this.state.borders.length>0}
+                    />
+                  ))
+                  : <span>none</span>}
+                </CountryInfo>
+                <CountryMap
+                  lat={this.state.lat}
+                  lng={this.state.lng}
+                />
+              </Fragment>
             : <Dummy/>
           }
         </RightCol>
